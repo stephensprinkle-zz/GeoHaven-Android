@@ -17,10 +17,6 @@ public class Home extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		TextView textview = new TextView(this);
-        textview.setText("This is the Home tab");
-        setContentView(textview);
-
+		setContentView(R.layout.home);
 	}
 }
