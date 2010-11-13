@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GeoHaven</string>
+
+    <string name="map">Map</string>
+    <string name="preferences">Preferences</string>
+</resources>
