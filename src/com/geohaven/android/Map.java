@@ -1,9 +1,10 @@
 package com.geohaven.android;
 
-import android.app.Activity;
 import android.os.Bundle;
 
-public class Map extends Activity {
+import com.google.android.maps.MapActivity;
+
+public class Map extends MapActivity {
 	
 	public static final String EXTRA_LATITUDE = "latitude";
 	public static final String EXTRA_LONGITUDE = "longitude";
@@ -15,5 +16,11 @@ public class Map extends Activity {
     
 
 }
+
+	@Override
+	protected boolean isRouteDisplayed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }
