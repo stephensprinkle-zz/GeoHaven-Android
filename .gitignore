@@ -1,6 +1,5 @@
 gen
 bin
-.project
 .classpath
 *~
 *.bak
