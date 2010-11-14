@@ -1,5 +1,7 @@
 package com.geohaven.android;
 
+import java.io.IOException;
+
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,8 +12,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TabHost;
 
 public class GeoHavenMain extends TabActivity{	
@@ -22,6 +22,11 @@ public class GeoHavenMain extends TabActivity{
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.main);
 	
+	    try {
+			CrimeHelper.init(getAssets().open("data.tsv"));
+		} catch (IOException e) {
+			Log.e("DATA_OPEN", "couldn't open it", e);
+		}
 		initGPS();
 	}
 	
