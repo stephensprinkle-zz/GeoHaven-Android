@@ -13,10 +13,12 @@ public class Home extends Activity {
 		setContentView(R.layout.home);
 
 		TextView numCrimes = (TextView) findViewById(R.id.numCrimes);
-		numCrimes.setText(""+CrimeHelper.countInRectangle(Crime.Category.WALKING, 37, -122, 2, 2));
+		numCrimes.setText(""+CrimeHelper.countInRectangle(Crime.Category.WALKING, 37.75, -122.20, 0.058908, 0.051498));
 		
-//		TextView percievedRisk = (TextView) findViewById(R.id.percievedRisk);
-//		percievedRisk.setText("Moderate");
+		int[] qr = CrimeHelper.getQuadrantRatings(37.75, -122.20, 0.058908, 0.051498);
+		TextView perceivedRisk = (TextView) findViewById(R.id.perceivedRisk);
+		perceivedRisk.setText("Moderate");
+//		perceivedRisk.setText(""+qr[0] + qr[1] + qr[2] + qr[3] + qr[4] + qr[5] + qr[6] + qr[7] + qr[8]);
 //		
 //		TextView dataRecency = (TextView) findViewById(R.id.dataRecency);
 

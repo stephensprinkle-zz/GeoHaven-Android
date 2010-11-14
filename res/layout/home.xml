@@ -22,7 +22,7 @@
             android:text="Perceived risk"
             android:padding="3dip" />
         <TextView
-            android:id="@+id/percievedRisk"
+            android:id="@+id/perceivedRisk"
             android:text="Unknown"
             android:gravity="right"
             android:padding="3dip" />
