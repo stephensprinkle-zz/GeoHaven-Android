@@ -1,8 +1,63 @@
 package com.geohaven.android;
 
 import java.util.Date;
+import java.util.List;
 
 public class Crime {
+
+	public enum Category {
+		WALKING("Walking"), DRIVING("Driving"), SPENDING_THE_NIGHT("Spending the Night"), LIVING_THERE("Living There");
+
+		private List<Type> types;
+		private String name;
+
+		private Category(String n) {
+			name = n;
+		}
+
+		private void addType(Type t) {
+			types.add(t);
+		}
+
+		public String getName() {
+			return name;
+		}
+	}
+
+	{
+		Category.WALKING.addType(Type.DISORDERLY_CONDUCT);
+		Category.WALKING.addType(Type.DRUNKENNESS);
+		Category.WALKING.addType(Type.FELONY_ASSAULT);
+		Category.WALKING.addType(Type.FORCIBLE_RAPE);
+		Category.WALKING.addType(Type.KIDNAPPING);
+		Category.WALKING.addType(Type.MISDEMEANOR_ASSAULT);
+		Category.WALKING.addType(Type.OTHER_SEX_OFFENSES);
+		Category.WALKING.addType(Type.PROSTITUTION);
+		Category.WALKING.addType(Type.VANDALISM);
+
+		Category.DRIVING.addType(Type.BURG_AUTO);
+		Category.DRIVING.addType(Type.DUI);
+		Category.DRIVING.addType(Type.GRAND_THEFT);
+		Category.DRIVING.addType(Type.STOLEN_VEHICLE);
+
+		Category.SPENDING_THE_NIGHT.addType(Type.BURG_RESIDENTIAL);
+		Category.SPENDING_THE_NIGHT.addType(Type.BURG_OTHER);
+		Category.SPENDING_THE_NIGHT.addType(Type.ARSON);
+		Category.SPENDING_THE_NIGHT.addType(Type.DOMESTIC_VIOLENCE);
+		Category.SPENDING_THE_NIGHT.addType(Type.KIDNAPPING);
+		Category.SPENDING_THE_NIGHT.addType(Type.HOMICIDE);
+		Category.SPENDING_THE_NIGHT.addType(Type.PETTY_THEFT);
+		Category.SPENDING_THE_NIGHT.addType(Type.WEAPONS);
+
+		Category.LIVING_THERE.addType(Type.ARSON);
+		Category.LIVING_THERE.addType(Type.BURG_RESIDENTIAL);
+		Category.LIVING_THERE.addType(Type.FELONY_ASSAULT);
+		Category.LIVING_THERE.addType(Type.FORCIBLE_RAPE);
+		Category.LIVING_THERE.addType(Type.GRAND_THEFT);
+		Category.LIVING_THERE.addType(Type.NARCOTICS);
+		Category.LIVING_THERE.addType(Type.ROBBERY);
+		Category.LIVING_THERE.addType(Type.VANDALISM);
+	}
 
 	public enum Type {
 
@@ -67,7 +122,8 @@ public class Crime {
 			return false;
 		}
 
-		if (left > right) { // special case, spanning the international date line!
+		if (left > right) { // special case, spanning the international date
+			// line!
 			if (longitude > left || longitude < right) {
 				return false;
 			}
@@ -76,7 +132,7 @@ public class Crime {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
