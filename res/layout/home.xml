@@ -19,7 +19,7 @@
     <TableRow>
         <TextView
             android:layout_column="1"
-            android:text="Percieved risk"
+            android:text="Perceived risk"
             android:padding="3dip" />
         <TextView
             android:id="@+id/percievedRisk"
