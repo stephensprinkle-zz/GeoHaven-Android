@@ -1,14 +1,14 @@
 package com.geohaven.android;
 
-import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Crime {
 
 	public enum Category {
 		WALKING("Walking"), DRIVING("Driving"), SPENDING_THE_NIGHT("Spending the Night"), LIVING_THERE("Living There");
 
-		private List<Type> types;
+		private Set<Type> types = new HashSet<Type>();
 		private String name;
 
 		private Category(String n) {
@@ -19,6 +19,10 @@ public class Crime {
 			types.add(t);
 		}
 
+		public Set<Type> getTypes() {
+			return types;
+		}
+		
 		public String getName() {
 			return name;
 		}
@@ -92,7 +96,7 @@ public class Crime {
 	}
 
 	private Type type;
-	private Date datetime;
+//	private Date datetime;
 	// private String casenumber;
 	// private String description;
 	// private String policebeat;
@@ -101,13 +105,15 @@ public class Crime {
 	private double latitude;
 	private double longitude;
 
-	public Crime(Type type, Date datetime,
+	public Crime(Type type,
+//			Date datetime,
 	// String casenumber, String description, String policebeat, String address,
 			// String googleAddress,
 			double latitude, double longitude) {
 
 		this.type = type;
-		this.datetime = datetime;
+//		this.datetime = datetime;
+		
 		// this.casenumber = casenumber;
 		// this.description = description;
 		// this.policebeat = policebeat;
@@ -137,6 +143,8 @@ public class Crime {
 	}
 
 	public String toString() {
-		return type + " AT:" + datetime + " LAT:" + latitude + " LONG:" + longitude;
+		return type
+//		+ " AT:" + datetime
+		+ " LAT:" + latitude + " LONG:" + longitude;
 	}
 }

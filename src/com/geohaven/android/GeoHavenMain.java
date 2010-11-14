@@ -23,7 +23,7 @@ public class GeoHavenMain extends TabActivity{
 	    setContentView(R.layout.main);
 	
 	    try {
-			CrimeHelper.init(getAssets().open("data.tsv"));
+			CrimeHelper.init(getAssets().open("crimedata.tsv"));
 		} catch (IOException e) {
 			Log.e("DATA_OPEN", "couldn't open it", e);
 		}

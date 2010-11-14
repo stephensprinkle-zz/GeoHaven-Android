@@ -33,7 +33,9 @@ public class CrimeHelper {
 						list = new ArrayList<Crime>();
 						lists.put(type, list);
 					}
-					list.add(new Crime(type, tsvDf.parse(cols[1]), Double.valueOf(cols[2]), Double.valueOf(cols[3])));
+					list.add(new Crime(type,
+//							tsvDf.parse(cols[1]),
+							Double.valueOf(cols[1]), Double.valueOf(cols[2])));
 				}
 			}
 			in.close();
@@ -52,11 +54,27 @@ public class CrimeHelper {
 		return getByRectangle(type, latC, longC, width, height).size();
 	}
 
-	public static List<Crime> getByRectangle(List<Crime> list, double latC, double longC, double width, double height) {
+	public static int countInRectangle(Crime.Category cat, double latC, double longC, double width, double height) {
+		return getByRectangle(cat, latC, longC, width, height).size();
+	}
+
+	public static List<Crime> getByRectangle(Crime.Category cat, double latC, double longC, double width, double height) {
 		List<Crime> result = new ArrayList<Crime>();
 
+		for (Crime.Type t : cat.getTypes()) {
+			result.addAll(getByRectangle(t, latC, longC, width, height));
+		}
+		
+		return result;
+	}
+	
+		public static List<Crime> getByRectangle(List<Crime> list, double latC, double longC, double width, double height) {
+		List<Crime> result = new ArrayList<Crime>();
+
+		if (list == null) return result;
+		
 		for (Crime c : list) {
-			if (c.isInRect(latC - height / 2, latC + height / 2, longC + width / 2, longC - width / 2)) {
+			if (c.isInRect(longC - width / 2, longC + width / 2, latC + height / 2, latC - height / 2)) {
 				result.add(c);
 			}
 		}
