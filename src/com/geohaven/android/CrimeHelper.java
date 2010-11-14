@@ -22,9 +22,9 @@ public class CrimeHelper {
 			DataInputStream in = new DataInputStream(instream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-//			int count = 0;
+			// int count = 0;
 			while ((strLine = br.readLine()) != null) {
-//				Log.w("building", "got " + count++);
+				// Log.w("building", "got " + count++);
 				String[] cols = strLine.split("\t");
 				if (cols.length >= 3) {
 					Crime.Type type = Crime.Type.getByKey(cols[0]);
@@ -34,14 +34,14 @@ public class CrimeHelper {
 						lists.put(type, list);
 					}
 					list.add(new Crime(type,
-//							tsvDf.parse(cols[1]),
+					// tsvDf.parse(cols[1]),
 							Double.valueOf(cols[1]), Double.valueOf(cols[2])));
 				}
 			}
 			in.close();
 		} catch (Exception e) {// Catch exception if any
 			Log.e("CRIME LOAD", "failed", e);
-//			System.err.println("Error: " + e.getMessage());
+			// System.err.println("Error: " + e.getMessage());
 		}
 
 	}
@@ -64,15 +64,16 @@ public class CrimeHelper {
 		for (Crime.Type t : cat.getTypes()) {
 			result.addAll(getByRectangle(t, latC, longC, width, height));
 		}
-		
+
 		return result;
 	}
-	
-		public static List<Crime> getByRectangle(List<Crime> list, double latC, double longC, double width, double height) {
+
+	public static List<Crime> getByRectangle(List<Crime> list, double latC, double longC, double width, double height) {
 		List<Crime> result = new ArrayList<Crime>();
 
-		if (list == null) return result;
-		
+		if (list == null)
+			return result;
+
 		for (Crime c : list) {
 			if (c.isInRect(longC - width / 2, longC + width / 2, latC + height / 2, latC - height / 2)) {
 				result.add(c);
