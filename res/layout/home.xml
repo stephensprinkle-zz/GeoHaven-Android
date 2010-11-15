@@ -10,7 +10,8 @@
             android:text="Number of crimes within 5 miles"
             android:padding="3dip" />
         <TextView
-            android:text="Ctrl-O"
+        	android:id="@+id/numCrimes"
+            android:text="Unknown"
             android:gravity="right"
             android:padding="3dip" />
     </TableRow>
@@ -18,10 +19,11 @@
     <TableRow>
         <TextView
             android:layout_column="1"
-            android:text="Percieved risk"
+            android:text="Perceived risk"
             android:padding="3dip" />
         <TextView
-            android:text="Ctrl-S"
+            android:id="@+id/perceivedRisk"
+            android:text="Unknown"
             android:gravity="right"
             android:padding="3dip" />
     </TableRow>
@@ -32,7 +34,8 @@
             android:text="Recency of data"
             android:padding="3dip" />
         <TextView
-            android:text="Ctrl-Shift-S"
+            android:id="@+id/dataRecency"
+            android:text="Nov 2010"
             android:gravity="right"
             android:padding="3dip" />
     </TableRow>
