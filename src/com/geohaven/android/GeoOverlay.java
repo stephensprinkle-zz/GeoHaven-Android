@@ -20,6 +20,7 @@ public class GeoOverlay extends ItemizedOverlay {
 	    mOverlays.add(overlay);
 	    populate();
 	}
+	
 	@Override
 	protected OverlayItem createItem(int i) {
 
