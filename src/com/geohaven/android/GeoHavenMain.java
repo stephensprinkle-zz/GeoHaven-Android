@@ -163,7 +163,7 @@ public class GeoHavenMain extends TabActivity {
 		tabHost.addTab(spec);
 
 		// Do the same for the other tabs
-		intent = new Intent().setClass(this, Map.class);
+		intent = new Intent().setClass(this, MapPanel.class);
 		spec = tabHost.newTabSpec("Map").setIndicator("Map", res.getDrawable(R.drawable.ic_tab_artists)).setContent(intent);
 		tabHost.addTab(spec);
 

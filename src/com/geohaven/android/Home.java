@@ -18,7 +18,7 @@ public class Home extends Activity {
 		int[] qr = CrimeHelper.getQuadrantRatings(37.75, -122.20, 0.058908, 0.051498);
 		TextView perceivedRisk = (TextView) findViewById(R.id.perceivedRisk);
 		perceivedRisk.setText("Moderate");
-//		perceivedRisk.setText(""+qr[0] + qr[1] + qr[2] + qr[3] + qr[4] + qr[5] + qr[6] + qr[7] + qr[8]);
+		perceivedRisk.setText(""+qr[0] + qr[1] + qr[2] + qr[3] + qr[4] + qr[5] + qr[6] + qr[7] + qr[8]);
 //		
 //		TextView dataRecency = (TextView) findViewById(R.id.dataRecency);
 
