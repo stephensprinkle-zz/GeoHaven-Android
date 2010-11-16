@@ -16,79 +16,44 @@ import com.google.android.maps.Overlay;
 
 public class MapPanel extends MapActivity {
 	Double latD, lonD;
-	Integer zoomLevel[] = { 14, 13, 12, 11, 10, 9 }; /*
-													 * assume zoom levels are 5,
-													 * 10, 20, 40, 80, 160
-													 */
+	Integer zoomLevel[] = { 14, 13, 12, 11, 10, 9 };
+	/*
+	 * assume zoom levels are 5, 10, 20, 40, 80, 160
+	 */
 	List<Overlay> mapOverlays;
 	Drawable drawableGreen, drawableRed, drawableOrange;
 	GeoOverlay itemizedOverlay;
 	MapView mapview;
 	int latSpan = 58908;
 	int lonSpan = 51498;
-	static final double LAT_STADIUM = 37.75 * 1E6;
-	static final double LON_STADIUM = -122.20 * 1E6;
+	static final double LAT_STADIUM = 37.75;
+	static final double LON_STADIUM = -122.20;
 	List<MyGeoPoint> zones = new ArrayList<MyGeoPoint>();
-	MyGeoPoint zoneObj0, zoneObj1, zoneObj2, zoneObj3, zoneObj4, zoneObj5, zoneObj6, zoneObj7, zoneObj8;
 
-	private MyGeoPoint createGeoPoint(double lat, double lon) {
-		MyGeoPoint zoneObj = new MyGeoPoint();
-		zoneObj.Lat = lat;
-		zoneObj.Lon = lon;
-		return zoneObj;
-	}
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mapview);
 
 		/* create zone objects */
-		zoneObj0 = new MyGeoPoint();
-		zoneObj0.Lat = LAT_STADIUM + latSpan / 3;
-		zoneObj0.Lon = LON_STADIUM - lonSpan / 3; /* upper left */
-		zones.add(zoneObj0);
-
-		zoneObj1 = new MyGeoPoint();
-		zoneObj1.Lat = LAT_STADIUM + latSpan / 3;
-		zoneObj1.Lon = LON_STADIUM; /* upper middle */
-		zones.add(zoneObj1);
-
-		zoneObj2 = new MyGeoPoint();
-		zoneObj2.Lat = LAT_STADIUM + latSpan / 3;
-		zoneObj2.Lon = LON_STADIUM + lonSpan / 3; /* upper right */
-		zones.add(zoneObj2);
-
-		zoneObj3 = new MyGeoPoint();
-		zoneObj3.Lat = LAT_STADIUM;
-		zoneObj3.Lon = LON_STADIUM - lonSpan / 3; /* left middle */
-		zones.add(zoneObj3);
-
-		zoneObj4 = new MyGeoPoint();
-		zoneObj4.Lat = LAT_STADIUM; /* middle */
-		zoneObj4.Lon = LON_STADIUM;
-
-		zones.add(zoneObj4);
-
-		zoneObj5 = new MyGeoPoint();
-		zoneObj5.Lat = LAT_STADIUM;
-		zoneObj5.Lon = LON_STADIUM + lonSpan / 3; /* right middle */
-		zones.add(zoneObj5);
-
-		zoneObj6 = new MyGeoPoint();
-		zoneObj6.Lat = LAT_STADIUM - latSpan / 3;
-		zoneObj6.Lon = LON_STADIUM - lonSpan / 3; /* left bottom */
-		zones.add(zoneObj6);
-
-		zoneObj7 = new MyGeoPoint();
-		zoneObj7.Lat = LAT_STADIUM - latSpan / 3;
-		zoneObj7.Lon = LON_STADIUM; /* middle bottom */
-		zones.add(zoneObj7);
-
-		zoneObj8 = new MyGeoPoint();
-		zoneObj8.Lat = LAT_STADIUM - latSpan / 3;
-		zoneObj8.Lon = LON_STADIUM + lonSpan / 3; /* right bottom */
-		zones.add(zoneObj8);
+		/* upper left */
+		zones.add(new MyGeoPoint(LAT_STADIUM + latSpan/1e6 / 3, LON_STADIUM - lonSpan/1e6 / 3));
+		/* upper middle */
+		zones.add(new MyGeoPoint(LAT_STADIUM + latSpan/1e6 / 3, LON_STADIUM));
+		/* upper right */
+		zones.add(new MyGeoPoint(LAT_STADIUM + latSpan/1e6 / 3, LON_STADIUM + lonSpan/1e6 / 3));
+		/* left middle */
+		zones.add(new MyGeoPoint(LAT_STADIUM, LON_STADIUM - lonSpan/1e6 / 3));
+		/* middle */
+		zones.add(new MyGeoPoint(LAT_STADIUM, LON_STADIUM));
+		/* right middle */
+		zones.add(new MyGeoPoint(LAT_STADIUM, LON_STADIUM + lonSpan/1e6 / 3));
+		/* left bottom */
+		zones.add(new MyGeoPoint(LAT_STADIUM - latSpan/1e6 / 3, LON_STADIUM - lonSpan/1e6 / 3));
+		/* middle bottom */
+		zones.add(new MyGeoPoint(LAT_STADIUM - latSpan/1e6 / 3, LON_STADIUM));
+		/* right bottom */
+		zones.add(new MyGeoPoint(LAT_STADIUM - latSpan/1e6 / 3, LON_STADIUM + lonSpan/1e6 / 3));
 
 		displayLocation();
 		fillZones();
@@ -114,14 +79,13 @@ public class MapPanel extends MapActivity {
 			 * hardcode lat/long latD = Globals.lastGeoLat * 1E6; lonD =
 			 * Globals.lastGeoLong * 1E6;
 			 */
-			latD = LAT_STADIUM;
-			lonD = LON_STADIUM;
+			latD = LAT_STADIUM * 1e6;
+			lonD = LON_STADIUM * 1e6;
 		}
 
 		Log.d("MAPIT", "latD = " + latD + "longD =" + lonD);
 		Integer lat = latD.intValue();
 		Integer lon = lonD.intValue();
-		ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
 		GeoOverlay itemizedOverlay = null;
 		GeoPoint geopoint = new GeoPoint(lat, lon);
 
@@ -132,19 +96,12 @@ public class MapPanel extends MapActivity {
 		drawableRed = this.getResources().getDrawable(R.drawable.red1);
 		drawableOrange = this.getResources().getDrawable(R.drawable.orange1);
 
-		/*
-		 * GeoPoint point = new GeoPoint(19240000,-99120000);
-		 */
-
-		Log.d("MAPIT", "Latitude = " + zoneObj8.Lat.intValue() + "Longitude = " + zoneObj8.Lon.intValue());
-		GeoPoint point = new GeoPoint(zoneObj8.Lat.intValue(), zoneObj8.Lon.intValue());
-
-		int[] safetyRatings = CrimeHelper.getQuadrantRatings(LAT_STADIUM / 1E6, LON_STADIUM / 1E6, lonSpan / 1E6, latSpan / 1E6);
+		int[] safetyRatings = CrimeHelper.getQuadrantRatings(LAT_STADIUM, LON_STADIUM, lonSpan / 1E6, latSpan / 1E6);
 		Log.d("MAPIT", "Safety ratings = " + safetyRatings[0] + safetyRatings[1] + safetyRatings[2] + safetyRatings[3]
 				+ safetyRatings[4] + safetyRatings[5] + safetyRatings[6] + safetyRatings[7] + safetyRatings[8]);
 
 		for (int i = 0; i <= 8; i++) {
-			GeoPoint point1 = new GeoPoint(zones.get(i).Lat.intValue(), zones.get(i).Lon.intValue());
+			GeoPoint point1 = new GeoPoint(zones.get(i).getLat(), zones.get(i).getLon());
 
 			OverlayItem overlayitem = new OverlayItem(point1, "", "");
 
@@ -163,14 +120,13 @@ public class MapPanel extends MapActivity {
 			itemizedOverlay.addOverlay(overlayitem);
 			mapOverlays.add((Overlay) itemizedOverlay);
 		}
-		
+
 		Log.d("Mapit", "lat = " + lat + "long = " + lon);
 		MapController mapController = mapview.getController();
 		mapController.setCenter(geopoint);
 
 		mapController.setZoom(14);
 		mapview.setBuiltInZoomControls(true);
-
 	}
 
 	private void fillZones() {
@@ -178,8 +134,20 @@ public class MapPanel extends MapActivity {
 	}
 
 	private class MyGeoPoint {
-		Double Lat;
-		Double Lon;
+		private int lat;
+		private int lon;
 
+		public MyGeoPoint(double lat, double lon) {
+			this.lat = (int) (lat * 1e6);
+			this.lon = (int) (lon * 1e6);
+		}
+
+		public int getLat() {
+			return lat;
+		}
+
+		public int getLon() {
+			return lon;
+		}
 	}
 }
