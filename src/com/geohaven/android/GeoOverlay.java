@@ -16,6 +16,7 @@ public class GeoOverlay extends ItemizedOverlay<OverlayItem> {
 
 	public GeoOverlay(Drawable defaultMarker) {
 		super(boundCenter(defaultMarker));
+		throw new IllegalAccessError("Need to have a context for the overlays");
 	}
 
 	public GeoOverlay(Drawable defaultMarker, Context context) {
@@ -38,6 +39,7 @@ public class GeoOverlay extends ItemizedOverlay<OverlayItem> {
 		return overlays.size();
 	}
 
+	// making sure we don't have drop shadows under the colors
 	@Override
 	public void draw(android.graphics.Canvas canvas, MapView mapView, boolean shadow) {
 		super.draw(canvas, mapView, false);
