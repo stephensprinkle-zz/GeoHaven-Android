@@ -29,6 +29,10 @@ public class GeoOverlay extends ItemizedOverlay<OverlayItem> {
 		populate();
 	}
 
+	public void clear() {
+		overlays = new ArrayList<OverlayItem>();	
+	}
+	
 	@Override
 	protected OverlayItem createItem(int i) {
 		return overlays.get(i);

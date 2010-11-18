@@ -15,22 +15,20 @@ import com.google.android.maps.OverlayItem;
 import com.google.android.maps.Overlay;
 
 public class MapPanel extends MapActivity {
-	Double latD, lonD;
-	Integer zoomLevel[] = { 14, 13, 12, 11, 10, 9 };
-	/*
-	 * assume zoom levels are 5, 10, 20, 40, 80, 160
-	 */
-	List<Overlay> mapOverlays;
-	GeoOverlay itemizedOverlay;
-	MapView mapview;
-	int latSpan = 58908;
-	int lonSpan = 51498;
-	static final double LAT_STADIUM = 37.75;
-	static final double LON_STADIUM = -122.20;
-	List<MyGeoPoint> zones = new ArrayList<MyGeoPoint>();
-	
-	Drawable drawableGreen, drawableOrange, drawableRed;
-	GeoOverlay itemizedOverlaySafe, itemizedOverlayMedium, itemizedOverlayDangerous;
+	private static final String LOG_TAG = "MAPPANEL";
+	private static final double LAT_STADIUM = 37.75;
+	private static final double LON_STADIUM = -122.20;
+
+	private List<Overlay> mapOverlays;
+	private EnhancedMapView mapview;
+	private int latSpan = 58908;
+	private int lonSpan = 51498;
+	private MyGeoPoint mapCenter = new MyGeoPoint(LAT_STADIUM, LON_STADIUM);
+	private List<MyGeoPoint> zones = new ArrayList<MyGeoPoint>();
+
+	private Drawable drawableGreen, drawableOrange, drawableRed;
+	private GeoOverlay itemizedOverlaySafe, itemizedOverlayMedium, itemizedOverlayDangerous;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -39,45 +37,72 @@ public class MapPanel extends MapActivity {
 		drawableGreen = this.getResources().getDrawable(R.drawable.green1);
 		drawableOrange = this.getResources().getDrawable(R.drawable.orange1);
 		drawableRed = this.getResources().getDrawable(R.drawable.red1);
-		
-		mapview = (MapView) findViewById(R.id.mapv);
-		mapOverlays = mapview.getOverlays();
+
+		mapview = (EnhancedMapView) findViewById(R.id.mapv);
+		mapview.setBuiltInZoomControls(true);
+
+		mapview.setOnZoomChangeListener(new EnhancedMapView.OnZoomChangeListener() {
+			@Override
+			public void onZoomChange(MapView view, int newZoom, int oldZoom) {
+				Log.d(LOG_TAG, "zoom changed from " + oldZoom + " to " + newZoom);
+				Log.d(LOG_TAG, "Latitude Span = " + mapview.getLatitudeSpan() + "Longitude Span = " + mapview.getLongitudeSpan());
+				latSpan = mapview.getLatitudeSpan();
+				lonSpan = mapview.getLongitudeSpan();
+				populateZones(mapCenter, latSpan, lonSpan);
+				calculateOverlays();
+			}
+		});
+		mapview.setOnPanChangeListener(new EnhancedMapView.OnPanChangeListener() {
+			public void onPanChange(MapView view, GeoPoint newCenter, GeoPoint oldCenter) {
+				Log.d(LOG_TAG, "center changed from " + oldCenter.getLatitudeE6() + "," + oldCenter.getLongitudeE6() + " to "
+						+ newCenter.getLatitudeE6() + "," + newCenter.getLongitudeE6());
+				Log.d(LOG_TAG, "Latitude Span = " + mapview.getLatitudeSpan() + "Longitude Span = " + mapview.getLongitudeSpan());				
+				mapCenter = new MyGeoPoint(newCenter.getLatitudeE6(), newCenter.getLongitudeE6());
+				populateZones(mapCenter, latSpan, lonSpan);
+				calculateOverlays();
+			}
+		});
 
 		itemizedOverlaySafe = new GeoOverlay(drawableGreen, this);
 		itemizedOverlayMedium = new GeoOverlay(drawableOrange, this);
 		itemizedOverlayDangerous = new GeoOverlay(drawableRed, this);
+
+		mapOverlays = mapview.getOverlays();
 		mapOverlays.add(itemizedOverlaySafe);
 		mapOverlays.add(itemizedOverlayMedium);
 		mapOverlays.add(itemizedOverlayDangerous);
-
-		populateZones(new MyGeoPoint(LAT_STADIUM, LON_STADIUM), latSpan, lonSpan);
-
 	}
 
 	private void populateZones(MyGeoPoint center, int latSpan, int lonSpan) {
+		Log.d(LOG_TAG, "LatSpan = " + latSpan + "LonSpan = " + lonSpan);
+
 		double cLat = center.getLat();
 		double cLon = center.getLon();
-		double boxLat = latSpan/1e6 / 3;
-		double boxLon = lonSpan/1e6 / 3;
-		
+		double boxLat = latSpan / 1e6 / 3;
+		double boxLon = lonSpan / 1e6 / 3;
+
 		zones.clear();
-		zones.add(new MyGeoPoint(cLat + boxLat, cLon - boxLon));	// upper left
-		zones.add(new MyGeoPoint(cLat + boxLat, cLon));				// upper middle
-		zones.add(new MyGeoPoint(cLat + boxLat, cLon + boxLon));	// upper right
-		zones.add(new MyGeoPoint(cLat, cLon - boxLon));				// left middle
-		zones.add(new MyGeoPoint(cLat, cLon));						// middle
-		zones.add(new MyGeoPoint(cLat, cLon + boxLon));				// right middle
-		zones.add(new MyGeoPoint(cLat - boxLat, cLon - boxLon));	// left bottom
-		zones.add(new MyGeoPoint(cLat - boxLat, cLon));				// middle bottom
-		zones.add(new MyGeoPoint(cLat - boxLat, cLon + boxLon));	// right bottom
+		zones.add(new MyGeoPoint(cLat + boxLat, cLon - boxLon)); // upper left
+		zones.add(new MyGeoPoint(cLat + boxLat, cLon)); // upper middle
+		zones.add(new MyGeoPoint(cLat + boxLat, cLon + boxLon)); // upper right
+		zones.add(new MyGeoPoint(cLat, cLon - boxLon)); // left middle
+		zones.add(new MyGeoPoint(cLat, cLon)); // middle
+		zones.add(new MyGeoPoint(cLat, cLon + boxLon)); // right middle
+		zones.add(new MyGeoPoint(cLat - boxLat, cLon - boxLon)); // left bottom
+		zones.add(new MyGeoPoint(cLat - boxLat, cLon)); // middle bottom
+		zones.add(new MyGeoPoint(cLat - boxLat, cLon + boxLon)); // right bottom
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		displayLocation();
 
-		Log.d("MAPIT", "Latitude Span = " + mapview.getLatitudeSpan() + "Longitude Span = " + mapview.getLongitudeSpan());
+		MapController mapController = mapview.getController();
+		mapController.setCenter(mapCenter.asGeoPoint());
+
+		mapController.setZoom(14);
+
+		Log.d(LOG_TAG, "Latitude Span = " + mapview.getLatitudeSpan() + "Longitude Span = " + mapview.getLongitudeSpan());
 	}
 
 	@Override
@@ -85,24 +110,13 @@ public class MapPanel extends MapActivity {
 		return false;
 	}
 
-	private void displayLocation() {
-		{
-			/*
-			 * hardcode lat/long latD = Globals.lastGeoLat * 1E6; lonD =
-			 * Globals.lastGeoLong * 1E6;
-			 */
-			latD = LAT_STADIUM * 1e6;
-			lonD = LON_STADIUM * 1e6;
-		}
-
-		Log.d("MAPIT", "latD = " + latD + "longD =" + lonD);
-		Integer lat = latD.intValue();
-		Integer lon = lonD.intValue();
-
-		GeoPoint geopoint = new GeoPoint(lat, lon);
-
-		int[] safetyRatings = CrimeHelper.getQuadrantRatings(LAT_STADIUM, LON_STADIUM, lonSpan / 1E6, latSpan / 1E6);
-		Log.d("MAPIT", "Safety ratings = " + safetyRatings[0] + safetyRatings[1] + safetyRatings[2] + safetyRatings[3]
+	private void calculateOverlays() {
+		itemizedOverlaySafe.clear();
+		itemizedOverlayMedium.clear();
+		itemizedOverlayDangerous.clear();
+		
+		int[] safetyRatings = CrimeHelper.getAreaRatings(mapCenter.getLat(), mapCenter.getLon(), lonSpan / 1E6, latSpan / 1E6);
+		Log.d(LOG_TAG, "Safety ratings = " + safetyRatings[0] + safetyRatings[1] + safetyRatings[2] + safetyRatings[3]
 				+ safetyRatings[4] + safetyRatings[5] + safetyRatings[6] + safetyRatings[7] + safetyRatings[8]);
 
 		for (int i = 0; i <= 8; i++) {
@@ -122,13 +136,6 @@ public class MapPanel extends MapActivity {
 				itemizedOverlayDangerous.addOverlay(overlayitem);
 			}
 		}
-
-		Log.d("Mapit", "lat = " + lat + "long = " + lon);
-		MapController mapController = mapview.getController();
-		mapController.setCenter(geopoint);
-
-		mapController.setZoom(14);
-		mapview.setBuiltInZoomControls(true);
 	}
 
 	private class MyGeoPoint {
@@ -152,13 +159,21 @@ public class MapPanel extends MapActivity {
 		public double getLon() {
 			return lon;
 		}
-		
+
 		public int getGLat() {
-			return (int)(lat * 1e6);
+			return (int) (lat * 1e6);
 		}
 
 		public int getGLon() {
-			return (int)(lon * 1e6);
+			return (int) (lon * 1e6);
+		}
+
+		public GeoPoint asGeoPoint() {
+			return new GeoPoint(getGLat(), getGLon());
+		}
+		
+		public String toString() {
+			return "LAT: " + getGLat() + " LON: " + getGLon();
 		}
 	}
 }

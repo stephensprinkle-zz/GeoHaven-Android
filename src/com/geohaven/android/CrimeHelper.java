@@ -88,7 +88,7 @@ public class CrimeHelper {
 		return getByRectangle(list, latC, longC, width, height).size();
 	}
 
-	public static int[] getQuadrantRatings(double latC, double longC, double width, double height) {
+	public static int[] getAreaRatings(double latC, double longC, double width, double height) {
 		int[] results = new int[9];
 		Crime.Category cat = Crime.Category.WALKING;
 
