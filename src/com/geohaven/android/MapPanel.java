@@ -1,6 +1,5 @@
 package com.geohaven.android;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.graphics.drawable.Drawable;
@@ -25,7 +24,6 @@ public class MapPanel extends MapActivity {
 	private int lonSpan = 51498;
 	private MyGeoPoint mapCenter = new MyGeoPoint(LAT_STADIUM, LON_STADIUM);
 	private MyGeoArea visibleArea = new MyGeoArea(LAT_STADIUM, LON_STADIUM, latSpan, lonSpan);
-	private List<MyGeoPoint> zones = new ArrayList<MyGeoPoint>();
 
 	private Drawable drawableGreen, drawableOrange, drawableRed;
 	private GeoOverlay itemizedOverlaySafe, itemizedOverlayMedium, itemizedOverlayDangerous;
@@ -50,7 +48,6 @@ public class MapPanel extends MapActivity {
 				latSpan = mapview.getLatitudeSpan();
 				lonSpan = mapview.getLongitudeSpan();
 				visibleArea = new MyGeoArea(mapCenter, latSpan, lonSpan);
-//				populateZones(mapCenter, latSpan, lonSpan);
 				calculateOverlays();
 			}
 		});
@@ -61,7 +58,6 @@ public class MapPanel extends MapActivity {
 				Log.d(LOG_TAG, "Latitude Span = " + mapview.getLatitudeSpan() + "Longitude Span = " + mapview.getLongitudeSpan());				
 				mapCenter = new MyGeoPoint(newCenter.getLatitudeE6(), newCenter.getLongitudeE6());
 				visibleArea = new MyGeoArea(mapCenter, latSpan, lonSpan);
-//				populateZones(mapCenter, latSpan, lonSpan);
 				calculateOverlays();
 			}
 		});
@@ -71,26 +67,6 @@ public class MapPanel extends MapActivity {
 		itemizedOverlayDangerous = new GeoOverlay(drawableRed, this);
 
 		mapOverlays = mapview.getOverlays();
-	}
-
-	private void populateZones(MyGeoPoint center, int latSpan, int lonSpan) {
-		Log.d(LOG_TAG, "LatSpan = " + latSpan + "LonSpan = " + lonSpan);
-
-		double cLat = center.getLat();
-		double cLon = center.getLon();
-		double boxLat = latSpan / 1e6 / 3;
-		double boxLon = lonSpan / 1e6 / 3;
-
-		zones.clear();
-		zones.add(new MyGeoPoint(cLat + boxLat, cLon - boxLon)); // upper left
-		zones.add(new MyGeoPoint(cLat + boxLat, cLon)); // upper middle
-		zones.add(new MyGeoPoint(cLat + boxLat, cLon + boxLon)); // upper right
-		zones.add(new MyGeoPoint(cLat, cLon - boxLon)); // left middle
-		zones.add(new MyGeoPoint(cLat, cLon)); // middle
-		zones.add(new MyGeoPoint(cLat, cLon + boxLon)); // right middle
-		zones.add(new MyGeoPoint(cLat - boxLat, cLon - boxLon)); // left bottom
-		zones.add(new MyGeoPoint(cLat - boxLat, cLon)); // middle bottom
-		zones.add(new MyGeoPoint(cLat - boxLat, cLon + boxLon)); // right bottom
 	}
 
 	@Override
@@ -116,10 +92,7 @@ public class MapPanel extends MapActivity {
 		itemizedOverlayDangerous.clear();
 		
 		Log.w(LOG_TAG, "calculateOverlays: " + visibleArea);
-		int[] safetyRatings = CrimeHelper.getAreaRatings(mapCenter.getLat(), mapCenter.getLon(), lonSpan / 1E6, latSpan / 1E6);
 		AreaInfo[] ais = CrimeHelper.getAreaInfos(Crime.Category.WALKING, 3, visibleArea);
-		Log.d(LOG_TAG, "Safety ratings = " + safetyRatings[0] + safetyRatings[1] + safetyRatings[2] + safetyRatings[3]
-				+ safetyRatings[4] + safetyRatings[5] + safetyRatings[6] + safetyRatings[7] + safetyRatings[8]);
 
 		for (AreaInfo ai : ais) {
 			OverlayItem overlayitem = new OverlayItem(ai.getArea().getCenter().asGeoPoint(), "Area " + ai.getArea(), ai.toString());
@@ -144,26 +117,6 @@ public class MapPanel extends MapActivity {
 		if (itemizedOverlaySafe.size() > 0) mapOverlays.add(itemizedOverlaySafe);
 		if (itemizedOverlayMedium.size() > 0) mapOverlays.add(itemizedOverlayMedium);
 		if (itemizedOverlayDangerous.size() > 0) mapOverlays.add(itemizedOverlayDangerous);
-
-		/*
-		for (int i = 0; i <= 8; i++) {
-			GeoPoint point1 = new GeoPoint(zones.get(i).getGLat(), zones.get(i).getGLon());
-
-			OverlayItem overlayitem = new OverlayItem(point1, "Area " + i, "Yayaya");
-
-			if (safetyRatings[i] == 1) {
-				itemizedOverlaySafe.addOverlay(overlayitem);
-			}
-
-			if (safetyRatings[i] == 2) {
-				itemizedOverlayMedium.addOverlay(overlayitem);
-			}
-
-			if (safetyRatings[i] == 3) {
-				itemizedOverlayDangerous.addOverlay(overlayitem);
-			}
-		}
-		*/
 	}
 
 }

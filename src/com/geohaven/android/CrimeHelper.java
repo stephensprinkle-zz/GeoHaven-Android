@@ -63,7 +63,7 @@ public class CrimeHelper {
 		return getByRectangle(cat, a.getCenter().getLat(), a.getCenter().getLon(), a.getLatSpan(), a.getLonSpan());
 	}
 
-	public static List<Crime> getByRectangle(Crime.Category cat, double latC, double longC, double width, double height) {
+	private static List<Crime> getByRectangle(Crime.Category cat, double latC, double longC, double width, double height) {
 		List<Crime> result = new ArrayList<Crime>();
 
 		for (Crime.Type t : cat.getTypes()) {
@@ -73,7 +73,7 @@ public class CrimeHelper {
 		return result;
 	}
 
-	public static List<Crime> getByRectangle(List<Crime> list, double latC, double longC, double width, double height) {
+	private static List<Crime> getByRectangle(List<Crime> list, double latC, double longC, double width, double height) {
 		List<Crime> result = new ArrayList<Crime>();
 
 		if (list == null)
@@ -135,25 +135,7 @@ public class CrimeHelper {
 		return results;
 	}
 
-	public static int[] getAreaRatings(double latC, double longC, double width, double height) {
-		List<Integer> counts = new ArrayList<Integer>();
-
-		Crime.Category cat = Crime.Category.WALKING;
-
-		counts.add(countInRectangle(cat, latC + height / 3, longC - width / 3, width / 3, height / 3));
-		counts.add(countInRectangle(cat, latC + height / 3, longC, width / 3, height / 3));
-		counts.add(countInRectangle(cat, latC + height / 3, longC + width / 3, width / 3, height / 3));
-		counts.add(countInRectangle(cat, latC, longC - width / 3, width / 3, height / 3));
-		counts.add(countInRectangle(cat, latC, longC, width / 3, height / 3));
-		counts.add(countInRectangle(cat, latC, longC + width / 3, width / 3, height / 3));
-		counts.add(countInRectangle(cat, latC - height / 3, longC - width / 3, width / 3, height / 3));
-		counts.add(countInRectangle(cat, latC - height / 3, longC, width / 3, height / 3));
-		counts.add(countInRectangle(cat, latC - height / 3, longC + width / 3, width / 3, height / 3));
-
-		return normalize(3, counts);
-	}
-
-	public static int[] normalize(int range, List<Integer> values) {
+	private static int[] normalize(int range, List<Integer> values) {
 		if (range != 3) {
 			// TODO: make this generalizable to any (sane) range
 			throw new UnsupportedOperationException("Sorry, I can only handle normalizing to 3 values right now");
