@@ -59,6 +59,10 @@ public class CrimeHelper {
 		return getByRectangle(cat, latC, longC, width, height).size();
 	}
 
+	public static List<Crime> getByRectangle(Crime.Category cat, MyGeoArea a) {
+		return getByRectangle(cat, a.getCenter().getLat(), a.getCenter().getLon(), a.getLatSpan(), a.getLonSpan());
+	}
+
 	public static List<Crime> getByRectangle(Crime.Category cat, double latC, double longC, double width, double height) {
 		List<Crime> result = new ArrayList<Crime>();
 
@@ -88,22 +92,77 @@ public class CrimeHelper {
 		return getByRectangle(list, latC, longC, width, height).size();
 	}
 
-	public static int[] getAreaRatings(double latC, double longC, double width, double height) {
-		int[] results = new int[9];
-		Crime.Category cat = Crime.Category.WALKING;
+	public static int[] getAreaRatings(int perSide, MyGeoArea overallArea) {
+		return getAreaRatings(Crime.Category.WALKING, perSide, overallArea);
+	}
 
-		results[0] = countInRectangle(cat, latC + height / 3, longC - width / 3, width / 3, height / 3);
-		results[1] = countInRectangle(cat, latC + height / 3, longC, width / 3, height / 3);
-		results[2] = countInRectangle(cat, latC + height / 3, longC + width / 3, width / 3, height / 3);
-		results[3] = countInRectangle(cat, latC, longC - width / 3, width / 3, height / 3);
-		results[4] = countInRectangle(cat, latC, longC, width / 3, height / 3);
-		results[5] = countInRectangle(cat, latC, longC + width / 3, width / 3, height / 3);
-		results[6] = countInRectangle(cat, latC - height / 3, longC - width / 3, width / 3, height / 3);
-		results[7] = countInRectangle(cat, latC - height / 3, longC, width / 3, height / 3);
-		results[8] = countInRectangle(cat, latC - height / 3, longC + width / 3, width / 3, height / 3);
+	public static int[] getAreaRatings(Crime.Category cat, int perSide, MyGeoArea overallArea) {
+		AreaInfo[] ais = getAreaInfos(cat, perSide, overallArea);
+		List<Integer> l = new ArrayList<Integer>();
+		for (AreaInfo ai : ais) {
+			l.add(ai.getCrimeCount());
+		}
+
+		return normalize(3, l);
+	}
+
+	public static AreaInfo[] getAreaInfos(Crime.Category cat, int perSide, MyGeoArea overallArea) {
+		AreaInfo[] results = new AreaInfo[perSide * perSide];
+
+		double latSpan = overallArea.getLatSpan() / perSide;
+		double lonSpan = overallArea.getLonSpan() / perSide;
+
+		MyGeoPoint[] centers = overallArea.getCentersOfSubAreas(perSide);
+
+		int seqNo = 0;
+		for (MyGeoPoint p : centers) {
+			AreaInfo ai = new AreaInfo(new MyGeoArea(p, latSpan, lonSpan));
+			ai.populate(cat);
+			ai.setSequenceNumber(seqNo++);
+			results[ai.getSequenceNumber()] = ai;
+		}
 
 		List<Integer> l = new ArrayList<Integer>();
-		for (int i : results) {
+		for (AreaInfo ai : results) {
+			l.add(ai.getCrimeCount());
+		}
+
+		int[] normalized = normalize(3, l);
+		for (AreaInfo ai : results) {
+			ai.setNormalizedRating(normalized[ai.getSequenceNumber()]);
+		}
+		
+		return results;
+	}
+
+	public static int[] getAreaRatings(double latC, double longC, double width, double height) {
+		List<Integer> counts = new ArrayList<Integer>();
+
+		Crime.Category cat = Crime.Category.WALKING;
+
+		counts.add(countInRectangle(cat, latC + height / 3, longC - width / 3, width / 3, height / 3));
+		counts.add(countInRectangle(cat, latC + height / 3, longC, width / 3, height / 3));
+		counts.add(countInRectangle(cat, latC + height / 3, longC + width / 3, width / 3, height / 3));
+		counts.add(countInRectangle(cat, latC, longC - width / 3, width / 3, height / 3));
+		counts.add(countInRectangle(cat, latC, longC, width / 3, height / 3));
+		counts.add(countInRectangle(cat, latC, longC + width / 3, width / 3, height / 3));
+		counts.add(countInRectangle(cat, latC - height / 3, longC - width / 3, width / 3, height / 3));
+		counts.add(countInRectangle(cat, latC - height / 3, longC, width / 3, height / 3));
+		counts.add(countInRectangle(cat, latC - height / 3, longC + width / 3, width / 3, height / 3));
+
+		return normalize(3, counts);
+	}
+
+	public static int[] normalize(int range, List<Integer> values) {
+		if (range != 3) {
+			// TODO: make this generalizable to any (sane) range
+			throw new UnsupportedOperationException("Sorry, I can only handle normalizing to 3 values right now");
+		}
+
+		int[] results = new int[values.size()];
+
+		List<Integer> l = new ArrayList<Integer>();
+		for (int i : values) {
 			l.add(i);
 		}
 		Collections.sort(l);
@@ -111,10 +170,10 @@ public class CrimeHelper {
 		double lowCutoff = (l.get(3) + l.get(2)) * 1.0 / 2;
 		double highCutoff = (l.get(6) + l.get(5)) * 1.0 / 2;
 
-		for (int i = 0; i < results.length; i++) {
-			if (results[i] < lowCutoff) {
+		for (int i = 0; i < values.size(); i++) {
+			if (values.get(i) < lowCutoff) {
 				results[i] = 1;
-			} else if (results[i] > highCutoff) {
+			} else if (values.get(i) > highCutoff) {
 				results[i] = 3;
 			} else {
 				results[i] = 2;

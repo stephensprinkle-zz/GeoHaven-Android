@@ -11,8 +11,8 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
-import com.google.android.maps.OverlayItem;
 import com.google.android.maps.Overlay;
+import com.google.android.maps.OverlayItem;
 
 public class MapPanel extends MapActivity {
 	private static final String LOG_TAG = "MAPPANEL";
@@ -24,6 +24,7 @@ public class MapPanel extends MapActivity {
 	private int latSpan = 58908;
 	private int lonSpan = 51498;
 	private MyGeoPoint mapCenter = new MyGeoPoint(LAT_STADIUM, LON_STADIUM);
+	private MyGeoArea visibleArea = new MyGeoArea(LAT_STADIUM, LON_STADIUM, latSpan, lonSpan);
 	private List<MyGeoPoint> zones = new ArrayList<MyGeoPoint>();
 
 	private Drawable drawableGreen, drawableOrange, drawableRed;
@@ -48,7 +49,8 @@ public class MapPanel extends MapActivity {
 				Log.d(LOG_TAG, "Latitude Span = " + mapview.getLatitudeSpan() + "Longitude Span = " + mapview.getLongitudeSpan());
 				latSpan = mapview.getLatitudeSpan();
 				lonSpan = mapview.getLongitudeSpan();
-				populateZones(mapCenter, latSpan, lonSpan);
+				visibleArea = new MyGeoArea(mapCenter, latSpan, lonSpan);
+//				populateZones(mapCenter, latSpan, lonSpan);
 				calculateOverlays();
 			}
 		});
@@ -58,7 +60,8 @@ public class MapPanel extends MapActivity {
 						+ newCenter.getLatitudeE6() + "," + newCenter.getLongitudeE6());
 				Log.d(LOG_TAG, "Latitude Span = " + mapview.getLatitudeSpan() + "Longitude Span = " + mapview.getLongitudeSpan());				
 				mapCenter = new MyGeoPoint(newCenter.getLatitudeE6(), newCenter.getLongitudeE6());
-				populateZones(mapCenter, latSpan, lonSpan);
+				visibleArea = new MyGeoArea(mapCenter, latSpan, lonSpan);
+//				populateZones(mapCenter, latSpan, lonSpan);
 				calculateOverlays();
 			}
 		});
@@ -68,9 +71,6 @@ public class MapPanel extends MapActivity {
 		itemizedOverlayDangerous = new GeoOverlay(drawableRed, this);
 
 		mapOverlays = mapview.getOverlays();
-		mapOverlays.add(itemizedOverlaySafe);
-		mapOverlays.add(itemizedOverlayMedium);
-		mapOverlays.add(itemizedOverlayDangerous);
 	}
 
 	private void populateZones(MyGeoPoint center, int latSpan, int lonSpan) {
@@ -115,10 +115,37 @@ public class MapPanel extends MapActivity {
 		itemizedOverlayMedium.clear();
 		itemizedOverlayDangerous.clear();
 		
+		Log.w(LOG_TAG, "calculateOverlays: " + visibleArea);
 		int[] safetyRatings = CrimeHelper.getAreaRatings(mapCenter.getLat(), mapCenter.getLon(), lonSpan / 1E6, latSpan / 1E6);
+		AreaInfo[] ais = CrimeHelper.getAreaInfos(Crime.Category.WALKING, 3, visibleArea);
 		Log.d(LOG_TAG, "Safety ratings = " + safetyRatings[0] + safetyRatings[1] + safetyRatings[2] + safetyRatings[3]
 				+ safetyRatings[4] + safetyRatings[5] + safetyRatings[6] + safetyRatings[7] + safetyRatings[8]);
 
+		for (AreaInfo ai : ais) {
+			OverlayItem overlayitem = new OverlayItem(ai.getArea().getCenter().asGeoPoint(), "Area " + ai.getArea(), ai.toString());
+			
+			switch (ai.getNormalizedRating()) {
+			case 1:
+				itemizedOverlaySafe.addOverlay(overlayitem);				
+				break;
+			case 2:
+				itemizedOverlayMedium.addOverlay(overlayitem);				
+				break;
+			case 3:
+				itemizedOverlayDangerous.addOverlay(overlayitem);				
+				break;
+			default:
+				Log.w(LOG_TAG, "Wha?  Got a normalized rating of: " + ai.getNormalizedRating() + " for item " + ai);
+				break;
+			}
+		}
+		
+		mapOverlays.clear();
+		if (itemizedOverlaySafe.size() > 0) mapOverlays.add(itemizedOverlaySafe);
+		if (itemizedOverlayMedium.size() > 0) mapOverlays.add(itemizedOverlayMedium);
+		if (itemizedOverlayDangerous.size() > 0) mapOverlays.add(itemizedOverlayDangerous);
+
+		/*
 		for (int i = 0; i <= 8; i++) {
 			GeoPoint point1 = new GeoPoint(zones.get(i).getGLat(), zones.get(i).getGLon());
 
@@ -136,44 +163,7 @@ public class MapPanel extends MapActivity {
 				itemizedOverlayDangerous.addOverlay(overlayitem);
 			}
 		}
+		*/
 	}
 
-	private class MyGeoPoint {
-		private double lat;
-		private double lon;
-
-		public MyGeoPoint(double lat, double lon) {
-			this.lat = lat;
-			this.lon = lon;
-		}
-
-		public MyGeoPoint(int lat, int lon) {
-			this.lat = lat / 1e6;
-			this.lon = lon / 1e6;
-		}
-
-		public double getLat() {
-			return lat;
-		}
-
-		public double getLon() {
-			return lon;
-		}
-
-		public int getGLat() {
-			return (int) (lat * 1e6);
-		}
-
-		public int getGLon() {
-			return (int) (lon * 1e6);
-		}
-
-		public GeoPoint asGeoPoint() {
-			return new GeoPoint(getGLat(), getGLon());
-		}
-		
-		public String toString() {
-			return "LAT: " + getGLat() + " LON: " + getGLon();
-		}
-	}
 }

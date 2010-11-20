@@ -16,6 +16,7 @@ public class Home extends Activity {
 		numCrimes.setText(""+CrimeHelper.countInRectangle(Crime.Category.WALKING, 37.75, -122.20, 0.058908, 0.051498));
 		
 		int[] qr = CrimeHelper.getAreaRatings(37.75, -122.20, 0.058908, 0.051498);
+//		int[] qr = CrimeHelper.getAreaRatings(3, new MyGeoArea(37.75, -122.20, 0.058908, 0.051498));
 		TextView perceivedRisk = (TextView) findViewById(R.id.perceivedRisk);
 		perceivedRisk.setText("Moderate");
 		perceivedRisk.setText(""+qr[0] + qr[1] + qr[2] + qr[3] + qr[4] + qr[5] + qr[6] + qr[7] + qr[8]);
